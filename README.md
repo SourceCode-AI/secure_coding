@@ -11,6 +11,7 @@ Instructions & prerequisites:
 
 - [docker compose](https://docs.docker.com/compose/)
 - copy of this repository
+- all the commands should be run in the same directory hwere you cloned the repository. docker compose will pick up the configuration file automatically
 - run `docker compose pull` to pull the dependencies
 - run `docker compose build` to build the custom container with preinstalled tools
 
