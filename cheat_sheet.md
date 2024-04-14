@@ -47,11 +47,7 @@ diffoscope a.out b.out
 
 ```
 
-[Compare code in relases ](https://pypi.org/project/secure-coding-demo-package/)
-
-
-Malware exercise ~ 15 min
-
+CTX Malware exercise ~ 15 min
 
 
 Vault
@@ -71,6 +67,7 @@ docker compose exec -ti vault /bin/sh
 
 
 vault status
+vault login
 
 # Store secret
 vault kv put -mount=secret secure_coding my_key=my_value
