@@ -19,10 +19,9 @@ echo "listen_addresses='*'">>/etc/postgresql/15/main/postgresql.conf
 echo "host    all             all              0.0.0.0/0                       scram-sha-256">>/etc/postgresql/15/main/pg_hba.conf
 echo "host    all             all              ::/0                            scram-sha-256">>/etc/postgresql/15/main/pg_hba.conf
 
-PG_PASSWD=$(openssl rand -hex 16)
-echo $PG_PASSWD>/tmp/vault_pg_passwd
+#PG_PASSWD=$(openssl rand -hex 16)
+#sudo -u postgres psql -c "create role vault with login superuser password 'insecure'";
 
-sudo -u postgres psql -c "create role vault with login superuser password '$PG_PASSWD'";
 sudo -u postgres createdb vault
 systemctl restart postgresql
 
@@ -30,3 +29,4 @@ systemctl restart postgresql
 echo "export VAULT_SKIP_VERIFY=true">>/etc/bash.bashrc
 echo "export VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200">>/etc/bash.bashrc
 echo "export VAULT_ADDR=http://127.0.0.1:8200">>/etc/bash.bashrc
+touch /tmp/automation_finished
