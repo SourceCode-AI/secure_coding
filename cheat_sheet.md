@@ -3,30 +3,28 @@ Reproducible builds exercise
 
 Reproducing a package ~ 20min
 
-Exec inside the container `docker compose run --rm -ti secure_coding  /bin/bash`
-
 ```shell
 root@7ccad3d01d39:/# cd /local_data/python_package/
 
-root@7ccad3d01d39:/local_data/python_package# ls
+root@7ccad3d01d39:/secure_coding//python_package# ls
 pyproject.toml  secure_coding_demo_package
 
-root@7ccad3d01d39:/local_data/python_package# python3 -m build
+root@7ccad3d01d39:/secure_coding/python_package# python3 -m build
 ...
 Successfully built secure_coding_demo_package-0.0.1.tar.gz and secure_coding_demo_package-0.0.1-py3-none-any.whl
 
 
-root@7ccad3d01d39:/local_data/python_package# diffoscope dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /local_data/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
+root@7ccad3d01d39:/secure_coding/python_package# diffoscope dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /secure_coding/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
 
-root@7ccad3d01d39:/local_data/python_package# mkdir /local_data/html
-root@7ccad3d01d39:/local_data/python_package# diffoscope dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /local_data/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl --html-dir /local_data/html
+root@7ccad3d01d39:/secure_coding/python_package# mkdir /secure_coding/html
+root@7ccad3d01d39:/secure_coding/python_package# diffoscope dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /secure_coding/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl --html-dir /local_data/html
 
-root@7ccad3d01d39:/local_data/python_package# strip-nondeterminism dist/secure_coding_demo_package-0.0.1-py3-none-any.whl
-root@7ccad3d01d39:/local_data/python_package# diffoscope dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /local_data/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
-root@7ccad3d01d39:/local_data/python_package# md5sum dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /local_data/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
+root@7ccad3d01d39:/secure_coding/python_package# strip-nondeterminism dist/secure_coding_demo_package-0.0.1-py3-none-any.whl
+root@7ccad3d01d39:/secure_coding/python_package# diffoscope dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /local_data/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
+root@7ccad3d01d39:/secure_coding/python_package# md5sum dist/secure_coding_demo_package-0.0.1-py3-none-any.whl /local_data/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
 
 e11a303eef41e70032b4130652e740be  dist/secure_coding_demo_package-0.0.1-py3-none-any.whl
-e11a303eef41e70032b4130652e740be  /local_data/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
+e11a303eef41e70032b4130652e740be  /secure_coding/prebuild_package/secure_coding_demo_package-0.0.1-py3-none-any.whl
 ```
 
 
@@ -60,12 +58,6 @@ Vault KV
 
 ```bash
 # verify creds
-
-docker compose logs vault
-
-docker compose exec -ti vault /bin/sh
-
-
 vault status
 vault login
 
@@ -107,16 +99,27 @@ Vault PostgresQL Integration
 
 Setup DB
 ```shell
-docker compose exec -ti vault /bin/sh
-apk add postgresql-client
+root@debian12:~# sudo -u postgres psql -c "create role vault with login superuser password 'insecure'";
+could not change directory to "/root": Permission denied
+CREATE ROLE
 
-/ # psql -h postgres -U postgres
-Password for user postgres: not_so_secure_default_password
-postgres=# create database secure_data;
-postgres=# \c secure_data;
-secure_data=# create table users (name VARCHAR(255));
-secure_data=# \q
+root@debian12:~# psql --user vault --password --host 172.26.7.80 --db secure_db
+Password:
+psql (15.12 (Debian 15.12-0+deb12u2))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)
+Type "help" for help.
 
+secure_db=# create table users (name VARCHAR(255));
+CREATE TABLE
+secure_db=# insert into users values ('john doe');
+INSERT 0 1
+secure_db=# select * from users;
+   name
+----------
+ john doe
+(1 row)
+
+secure_db=# exit
 ```
 
 Configure vault
@@ -129,8 +132,8 @@ Success! Enabled the database secrets engine at: database/
 / # vault write database/config/secure_db \
  plugin_name="postgresql-database-plugin" \
  allowed_roles="secure_coding_role" \
- connection_url="postgresql://{{username}}:{{password}}@postgres:5432/secure_data" \
- username="postgres" \
+ connection_url="postgresql://{{username}}:{{password}}@<YOUR_IP>:5432/secure_db?sslmode=disable" \
+ username="vault" \
  password="not_so_secure_default_password"
 Success! Data written to: database/config/secure_db
 
