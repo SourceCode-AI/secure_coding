@@ -19,9 +19,16 @@ Instructions & prerequisites:
 Installation:
 ---
 
-Create a Debian12 VM machine with the default options:
+Create a Debian13 VM machine with the default options:
 
 ![vm_creation.png](vm_creation.png)
+
+
+Connect to your machine via SSH as root:
+```ssh root@<IP>```
+
+You can find the ip at the vm details page
+![vm_ip.png](vm_ip.png)
 
 
 When the VM boots up, login via ssh and run the following command:
@@ -32,6 +39,11 @@ curl "https://raw.githubusercontent.com/SourceCode-AI/secure_coding/refs/heads/m
 
 FAQ
 ===
+
+How do I remove the lab machine?
+---
+![remove_vm.png](remove_vm.png)
+
 
 How do I generate the SSH key?
 ---
@@ -52,3 +64,10 @@ How do I convert multiline key to one liner?
 
 
 `ssh-keygen -i -f /tmp/input_key` OR `puttygen -O public-openssh tmp/Public-Key`
+
+
+I get this error
+----
+![host_key_error.png](host_key_error.png)
+
+This means you may have recreate the machine in a short amount of time or the ip was recycled to which you previously connected. You must go to the file path at the highlighted location and remove the host identification lines for that ip address from your known_hosts file. After removing these lines from the file, you should be able to log in back
