@@ -59,7 +59,7 @@ Success! Enabled the database secrets engine at: database/
 / # vault write database/config/secure_db \
  plugin_name="postgresql-database-plugin" \
  allowed_roles="secure_coding_role" \
- connection_url="postgresql://{{username}}:{{password}}@<YOUR_IP>:5432/secure_db?sslmode=disable" \
+ connection_url="postgresql://{{username}}:{{password}}@127.0.0.1:5432/secure_db?sslmode=disable" \
  username="vault" \
  password="not_so_secure_default_password"
 Success! Data written to: database/config/secure_db
